@@ -8,15 +8,18 @@
 import UIKit
 
 final class TrackListViewController: UITableViewController {
-    private let trackList = Track.getTrackList()
+    private var trackList = Track.getTrackList()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.rowHeight = 80
+        navigationItem.leftBarButtonItem = editButtonItem
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
+        guard let indexPath = tableView.indexPathForSelectedRow else { return }
+        let detailsVC = segue.destination as? TrackDetailsViewController
+        detailsVC?.track = trackList[indexPath.row]
     }
 }
 
@@ -39,9 +42,20 @@ extension TrackListViewController {
         cell.contentConfiguration = content
         return cell
     }
+    
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let currentTrack = trackList.remove(at: sourceIndexPath.row)
+        trackList.insert(currentTrack, at: destinationIndexPath.row)
+    }
 }
 
 // MARK: - UITableViewDelegate
 extension TrackListViewController {
-
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        .none
+    }
+    
+    override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        false
+    }
 }
